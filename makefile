@@ -1,7 +1,7 @@
 GCC = g++ -std=c++17 
 MPICC = mpicxx -std=c++17 -g
-MPICC_COLL = /home/jie.yang/test/coll_len/mpich/build/_inst/bin/mpicxx -std=c++17 -g
-MPICH = /home/jie.yang/temp/mpi/mpich/build/_inst/bin/mpicxx -std=c++17 -g
+MPICC_COLL = /home/jayyee/test/2104_coll_len/mpich/build/_inst/bin/mpicxx -std=c++17 -g
+MPICH = /home/jayyee/temp/mpich/build/_inst/bin/mpicxx -std=c++17 -g
 
 MAKE_DIR = $(PWD)
 OBJ_DIR  := $(MAKE_DIR)/bin
