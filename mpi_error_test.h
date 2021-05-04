@@ -21,4 +21,7 @@ int Error_Test_gather(int argc, char **argv);
 /* Reduce error test*/
 int Error_Test_reduce(int argc, char **argv);
 
+/* Igather error test*/
+int Error_Test_igather(int argc, char **argv);
+
 #endif //ndef __MPI_ERROR_TEST__H

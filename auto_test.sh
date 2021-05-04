@@ -41,4 +41,14 @@ for ((i=0 ; i<8 ; i++)); do
 done
 echo "**************END Reduce error tests*******************"
 
+echo -e	
+echo "**************Perform Igather error tests*******************"
+
+for ((i=0 ; i<7 ; i++)); do
+	echo -e	
+	echo -e "\tTESTCASE $i"
+	test_func $timeout $num_proc 3 $i
+done
+echo "**************END Igather error tests*******************"
+
 echo "END AUTO TESTS."

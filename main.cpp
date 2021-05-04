@@ -28,10 +28,14 @@ int main(int argc, char **argv)
         case 2:
             Error_Test_reduce(argc, argv);
             break;
+
+        case 3:
+            Error_Test_igather(argc, argv);
+            break;
             
         default:
             printf("Collective %d is not defined.\n",op_num);
-            printf("0 bcast, 1 gather, 2 reduce.\n");
+            printf("0 bcast, 1 gather, 2 reduce, 3 igather.\n");
             break;
     }
 
