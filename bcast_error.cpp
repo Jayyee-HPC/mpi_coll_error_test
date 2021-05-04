@@ -12,17 +12,20 @@ int Error_Test_bcast(int argc, char **argv)
     //MPI initial
     int my_world_rank;
     int num_world_nodes;
-    int i, size;
-    int ierr;
+    int i, size, root;
+    int err, ierr;
     int *sendbuf;
     char str[MPI_MAX_ERROR_STRING + 1];
     int slen;
 
     int test_num = std::stoi(argv[2]);
+    ierr = 0;
+    err = MPI_SUCCESS;
+    root = 0;
 
     MPI_Comm_size(MPI_COMM_WORLD,&num_world_nodes);
     MPI_Comm_rank(MPI_COMM_WORLD,&my_world_rank);
-    ierr = MPI_SUCCESS;
+
 
     if(num_world_nodes < 3)
     {
@@ -31,86 +34,197 @@ int Error_Test_bcast(int argc, char **argv)
     }
 
     sendbuf = (int *)malloc(sizeof(int) * ARRAYSIZE);
-    for(i = 0; i < ARRAYSIZE; ++i)
+
+    if(my_world_rank == 0)
     {
-        sendbuf[i] = i+my_world_rank;
+        for(i = 0; i < ARRAYSIZE; ++i)
+        {
+            sendbuf[i] = i;
+        }
+    }
+    else
+    {
+        for(i = 0; i < ARRAYSIZE; ++i)
+        {
+            sendbuf[i] = -1;
+        }
     }
 
     switch(test_num)
     {
         case 0:
             /* Root send more */
-            if (my_world_rank == 0) 
+            if (my_world_rank == root) 
             {
-                ierr = MPI_Bcast(sendbuf, ARRAYSIZE, MPI_INT, 0, MPI_COMM_WORLD);
-            } 
-            else 
-            {
-                ierr = MPI_Bcast(sendbuf, ARRAYSIZE/2, MPI_INT, 0, MPI_COMM_WORLD);
+                size = ARRAYSIZE;
             }
+            else
+            {
+                size = ARRAYSIZE/2;
+            }
+
+            err = MPI_Bcast(sendbuf, size, MPI_INT, root, MPI_COMM_WORLD);
+
+            for (i = 0; i < size; ++i)
+            {
+                if(sendbuf[i] != i)
+                    ++ierr;
+            }
+
+            if (ierr)
+            {
+                printf("Rank %d, %d errors on receive\n", my_world_rank, ierr);
+            }
+
+            ierr = 0;
+
+            for (i = size; i < ARRAYSIZE; ++i)
+            {
+                if(root == my_world_rank && sendbuf[i] != i)
+                {
+                    ++ierr;
+                }
+                else if (root != my_world_rank && sendbuf[i] != -1)
+                {
+                    ++ierr;
+                }
+            }
+
+            if (ierr)
+            {
+                printf("Rank %d, %d errors on unexpected modifications\n", my_world_rank, ierr);
+            }
+
             break;
 
         case 1:
             /* Root send less */
-            if (my_world_rank == 0) 
+            if (my_world_rank == root) 
             {
-                ierr = MPI_Bcast(sendbuf, ARRAYSIZE/2, MPI_INT, 0, MPI_COMM_WORLD);
-            } 
-            else 
+                size = ARRAYSIZE/2;
+            }
+            else
             {
-                ierr = MPI_Bcast(sendbuf, ARRAYSIZE, MPI_INT, 0, MPI_COMM_WORLD);
+                size = ARRAYSIZE;
+            }
+
+            err = MPI_Bcast(sendbuf, size, MPI_INT, root, MPI_COMM_WORLD);
+
+            for (i = 0; i < ARRAYSIZE/2; ++i)
+            {
+                if(sendbuf[i] != i)
+                    ++ierr;
+            }
+
+            if (ierr)
+            {
+                printf("Rank %d, %d errors on receive\n", my_world_rank, ierr);
+            }
+
+            ierr = 0;
+
+            for (i = ARRAYSIZE/2; i < ARRAYSIZE; ++i)
+            {
+                if(root == my_world_rank && sendbuf[i] != i)
+                {
+                    ++ierr;
+                }
+                else if (root != my_world_rank && sendbuf[i] != -1)
+                {
+                    ++ierr;
+                }
+            }
+
+            if (ierr)
+            {
+                printf("Rank %d, %d errors on unexpected modifications\n", my_world_rank, ierr);
             }
             break;
 
         case 2:
             /* NULL send buf */
             sendbuf = NULL;
-            ierr = MPI_Bcast(sendbuf, ARRAYSIZE/2, MPI_INT, 0, MPI_COMM_WORLD);
+            size = ARRAYSIZE;
+            root = 0;
+
+            err = MPI_Bcast(sendbuf, size, MPI_INT, root, MPI_COMM_WORLD);
             break;
 
         case 3:
             /* Mismatch datatype */
+            size = ARRAYSIZE;
+            root = 0;
+
             if (my_world_rank == 0) 
             {
-                ierr = MPI_Bcast(sendbuf, ARRAYSIZE, MPI_UNSIGNED, 0, MPI_COMM_WORLD);
+                err = MPI_Bcast(sendbuf, size, MPI_UNSIGNED, root, MPI_COMM_WORLD);
             } 
             else 
             {
-                ierr = MPI_Bcast(sendbuf, ARRAYSIZE, MPI_INT, 0, MPI_COMM_WORLD);
+                err = MPI_Bcast(sendbuf, size, MPI_INT, root, MPI_COMM_WORLD);
             }
+
+            for (i = 0; i < size; ++i)
+            {
+                if(sendbuf[i] != i)
+                    ++ierr;
+            }
+
+            if (ierr)
+            {
+                printf("Rank %d, %d errors on receive\n", my_world_rank, ierr);
+            }
+
             break;
 
         case 4:
             /* Mismatch root */
+            size = ARRAYSIZE;
+
             if (my_world_rank == 0) 
             {
-                ierr = MPI_Bcast(sendbuf, ARRAYSIZE, MPI_INT, 0, MPI_COMM_WORLD);
+                root = 0;
             } 
-            else if (my_world_rank == 1) 
+            else
             {
-                ierr = MPI_Bcast(sendbuf, ARRAYSIZE, MPI_INT, 1, MPI_COMM_WORLD);
+                root = 5;
             }
-            else 
+
+            err = MPI_Bcast(sendbuf, size, MPI_INT, root, MPI_COMM_WORLD);
+
+            for (i = 0; i < size; ++i)
             {
-                ierr = MPI_Bcast(sendbuf, ARRAYSIZE, MPI_INT, 1, MPI_COMM_WORLD);
+                if(sendbuf[i] != i)
+                    ++ierr;
             }
+
+            if (ierr)
+            {
+                printf("Rank %d, %d errors on receive\n", my_world_rank, ierr);
+            }
+
             break;
 
         case 5:
             /* NULL COMM */
-            sendbuf = NULL;
-            ierr = MPI_Bcast(sendbuf, ARRAYSIZE/2, MPI_INT, 0, MPI_COMM_NULL);
+            size = ARRAYSIZE;
+            root = 0;
+
+            err = MPI_Bcast(sendbuf, size, MPI_INT, root, MPI_COMM_NULL);
             break;
 
         case 6:
             /* Mismatch COMM */
+            size = ARRAYSIZE;
+            root = 0;
+
             if (my_world_rank == 0) 
             {
-                ierr = MPI_Bcast(sendbuf, ARRAYSIZE, MPI_INT, 0, MPI_COMM_SELF);
+                err = MPI_Bcast(sendbuf, size, MPI_INT, root, MPI_COMM_SELF);
             } 
             else 
             {
-                ierr = MPI_Bcast(sendbuf, ARRAYSIZE, MPI_INT, 1, MPI_COMM_WORLD);
+                err = MPI_Bcast(sendbuf, size, MPI_INT, root, MPI_COMM_WORLD);
             }
             break;
 
@@ -119,10 +233,10 @@ int Error_Test_bcast(int argc, char **argv)
             break;
     }
 
-    if (ierr == MPI_SUCCESS) {
+    if (err == MPI_SUCCESS) {
         printf("Process %d found no error in bcast test %d \n", my_world_rank, test_num);
     } else {      
-        MPI_Error_string(ierr, str, &slen); 
+        MPI_Error_string(err, str, &slen); 
         printf("Process %d found error; message is: %s\n", my_world_rank, str);
     }
 

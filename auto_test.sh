@@ -8,7 +8,7 @@ timeout=10
 # test function
 function test_func(){
 	#mpirun --timeout $1 -np $2 ./prog $3 $4
-	env MPIEXEC_TIMEOUT=$1 /home/jie.yang/temp/mpi/mpich/build/_inst/bin/mpiexec -np $2 ./prog $3 $4
+	env MPIEXEC_TIMEOUT=$1 /home/jayyee/temp/mpich/build/_inst/bin/mpiexec -np $2 ./prog $3 $4
 }
 
 echo -e	
