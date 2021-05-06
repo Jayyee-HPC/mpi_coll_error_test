@@ -1,15 +1,16 @@
 GCC = g++ -std=c++17 
 MPICC = mpicxx -std=c++17 -g
-MPICC_COLL = /home/jie.yang/test/coll_len/mpich/build/_inst/bin/mpicxx -std=c++17 -g
-MPICH = /home/jie.yang/temp/mpi/mpich/build/_inst/bin/mpicxx -std=c++17 -g
+MPICC_COLL = /home/jayyee/test/2104_coll_len/mpich/build/_inst/bin/mpicxx -std=c++17 -g
+MPICH = /home/jayyee/temp/mpich/build/_inst/bin/mpicxx -std=c++17 -g
 
 MAKE_DIR = $(PWD)
 OBJ_DIR  := $(MAKE_DIR)/bin
 APP_DIR  := $(MAKE_DIR)
 TARGET   := prog
+INCLUDE  := -Iinclude
 
 SRC      :=                      \
-   $(wildcard *.cpp)        
+   $(wildcard src/*.cpp)        
 
 OBJECTS := $(SRC:%.cpp=$(OBJ_DIR)/%.o)
 
@@ -17,11 +18,11 @@ all: build $(APP_DIR)/$(TARGET)
 
 $(OBJ_DIR)/%.o: %.cpp
 	@mkdir -p $(@D)
-	$(MPICH) -o $@ -c $<
+	$(MPICH) $(INCLUDE) -o $@ -c $<
 
 $(APP_DIR)/$(TARGET): $(OBJECTS)
 	@mkdir -p $(@D)
-	$(MPICH) -o $(APP_DIR)/$(TARGET) $(OBJECTS)
+	$(MPICH) $(INCLUDE) -o $(APP_DIR)/$(TARGET) $(OBJECTS)
 
 .PHONY: all build clean debug release
 
