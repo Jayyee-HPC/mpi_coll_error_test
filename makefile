@@ -7,9 +7,10 @@ MAKE_DIR = $(PWD)
 OBJ_DIR  := $(MAKE_DIR)/bin
 APP_DIR  := $(MAKE_DIR)
 TARGET   := prog
+INCLUDE  := -Iinclude
 
 SRC      :=                      \
-   $(wildcard *.cpp)        
+   $(wildcard src/*.cpp)        
 
 OBJECTS := $(SRC:%.cpp=$(OBJ_DIR)/%.o)
 
@@ -17,11 +18,11 @@ all: build $(APP_DIR)/$(TARGET)
 
 $(OBJ_DIR)/%.o: %.cpp
 	@mkdir -p $(@D)
-	$(MPICH) -o $@ -c $<
+	$(MPICH) $(INCLUDE) -o $@ -c $<
 
 $(APP_DIR)/$(TARGET): $(OBJECTS)
 	@mkdir -p $(@D)
-	$(MPICH) -o $(APP_DIR)/$(TARGET) $(OBJECTS)
+	$(MPICH) $(INCLUDE) -o $(APP_DIR)/$(TARGET) $(OBJECTS)
 
 .PHONY: all build clean debug release
 
