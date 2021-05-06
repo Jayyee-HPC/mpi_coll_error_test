@@ -10,10 +10,15 @@
 #include <stdio.h>
 #include <string>
 
-#define ARRAYSIZE 1024
+#define VERBOSE 1
+#define ARRAYSIZE 10
 
+/***************************One to all, blocking************************************/
 /* Bcast error test*/
 int Error_Test_bcast(int argc, char **argv);
+
+/* Scan error test*/
+int Error_Test_exscan(int argc, char **argv);
 
 /* Gather error test*/
 int Error_Test_gather(int argc, char **argv);
@@ -21,6 +26,16 @@ int Error_Test_gather(int argc, char **argv);
 /* Reduce error test*/
 int Error_Test_reduce(int argc, char **argv);
 
+/* Scan error test*/
+int Error_Test_scan(int argc, char **argv);
+
+/* Scatter error test*/
+int Error_Test_scatter(int argc, char **argv);
+
+/* Scatterv error test*/
+int Error_Test_scatterv(int argc, char **argv);
+
+/***************************One to all, non-blocking********************************/
 /* Igather error test*/
 int Error_Test_igather(int argc, char **argv);
 
