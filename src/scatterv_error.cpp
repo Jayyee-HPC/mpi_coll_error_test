@@ -1,6 +1,6 @@
 #include "mpi_error_test.h"
 
-/* Scan error test*/
+/* Scatterv error test*/
 int Error_Test_scatterv(int argc, char **argv)
 {
     if(argc != 3)
@@ -45,8 +45,6 @@ int Error_Test_scatterv(int argc, char **argv)
         {
             sendbuf[i] = i + my_world_rank * ARRAYSIZE;
         }
-
-
     }
 
     for(i = 0; i < num_world_nodes; ++i)
@@ -258,5 +256,7 @@ int Error_Test_scatterv(int argc, char **argv)
 
     free(recvbuf);
     free(sendbuf);
+    free(sendcounts);
+    free(displs);
     return 0;
 }

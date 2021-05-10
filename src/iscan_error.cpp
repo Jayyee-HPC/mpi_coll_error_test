@@ -1,7 +1,7 @@
 #include "mpi_error_test.h"
 
-/* Scan error test*/
-int Error_Test_exscan(int argc, char **argv)
+/* Iscan error test*/
+int Error_Test_iscan(int argc, char **argv)
 {
     if(argc != 3)
     {
@@ -17,6 +17,8 @@ int Error_Test_exscan(int argc, char **argv)
     int *sendbuf, *recvbuf;
     char str[MPI_MAX_ERROR_STRING + 1];
     int slen;
+    MPI_Request request;
+    MPI_Status status;
 
     int test_num = std::stoi(argv[2]);
     ierr = 0;
@@ -58,22 +60,20 @@ int Error_Test_exscan(int argc, char **argv)
             }
             else
             {
-                size = ARRAYSIZE;
+                size = ARRAYSIZE/2;
             }
 
-            err = MPI_Exscan(sendbuf, recvbuf, size, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+            err = MPI_Iscan(sendbuf, recvbuf, size, MPI_INT, MPI_SUM, MPI_COMM_WORLD, &request);
+            MPI_Wait(&request, &status);
 
             if(VERBOSE)
             {
                 ierr = 0;
-                printf("%d rank, ", my_world_rank);
                 for(int i = 0; i < size; ++i)
                 {
                     /* TODO: */
-                    printf("%d ", recvbuf[i]);
-                }
 
-                printf("\n");
+                }
 
                 if(ierr)
                 {
@@ -94,7 +94,8 @@ int Error_Test_exscan(int argc, char **argv)
                 size = ARRAYSIZE;
             }
 
-            err = MPI_Scan(sendbuf, recvbuf, size, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+            err = MPI_Iscan(sendbuf, recvbuf, size, MPI_INT, MPI_SUM, MPI_COMM_WORLD, &request);
+            MPI_Wait(&request, &status);
 
             if(VERBOSE)
             {
@@ -118,7 +119,8 @@ int Error_Test_exscan(int argc, char **argv)
             sendbuf = NULL;
             size = ARRAYSIZE;
 
-            err = MPI_Scan(sendbuf, recvbuf, size, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+            err = MPI_Iscan(sendbuf, recvbuf, size, MPI_INT, MPI_SUM, MPI_COMM_WORLD, &request);
+            MPI_Wait(&request, &status);
 
             if(VERBOSE)
             {
@@ -143,12 +145,13 @@ int Error_Test_exscan(int argc, char **argv)
 
             if (my_world_rank == 0) 
             {
-                err = MPI_Scan(sendbuf, recvbuf, size, MPI_UNSIGNED, MPI_SUM, MPI_COMM_WORLD);
+                err = MPI_Iscan(sendbuf, recvbuf, size, MPI_UNSIGNED, MPI_SUM, MPI_COMM_WORLD, &request);
             } 
             else 
             {
-                err = MPI_Scan(sendbuf, recvbuf, size, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+                err = MPI_Iscan(sendbuf, recvbuf, size, MPI_INT, MPI_SUM, MPI_COMM_WORLD, &request);
             }
+            MPI_Wait(&request, &status);
 
             if(VERBOSE)
             {
@@ -172,7 +175,8 @@ int Error_Test_exscan(int argc, char **argv)
             /* NULL COMM */
             size = ARRAYSIZE;
 
-            err = MPI_Scan(sendbuf, recvbuf, size, MPI_INT, MPI_SUM, MPI_COMM_NULL);
+            err = MPI_Iscan(sendbuf, recvbuf, size, MPI_INT, MPI_SUM, MPI_COMM_NULL, &request);
+            MPI_Wait(&request, &status);
             break;
 
         case 5:
@@ -181,12 +185,13 @@ int Error_Test_exscan(int argc, char **argv)
 
             if (my_world_rank == 0) 
             {
-                err = MPI_Scan(sendbuf, recvbuf, size, MPI_INT, MPI_SUM, MPI_COMM_SELF);
+                err = MPI_Iscan(sendbuf, recvbuf, size, MPI_INT, MPI_SUM, MPI_COMM_SELF, &request);
             } 
             else 
             {
-                err = MPI_Scan(sendbuf, recvbuf, size, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+                err = MPI_Iscan(sendbuf, recvbuf, size, MPI_INT, MPI_SUM, MPI_COMM_WORLD, &request);
             }
+            MPI_Wait(&request, &status);
             break;
 
         case 6:
@@ -195,12 +200,13 @@ int Error_Test_exscan(int argc, char **argv)
 
             if (my_world_rank == 0) 
             {
-                err = MPI_Scan(sendbuf, recvbuf, size, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+                err = MPI_Iscan(sendbuf, recvbuf, size, MPI_INT, MPI_SUM, MPI_COMM_WORLD, &request);
             } 
             else 
             {
-                err = MPI_Scan(sendbuf, recvbuf, size, MPI_INT, MPI_MAX, MPI_COMM_WORLD);
+                err = MPI_Iscan(sendbuf, recvbuf, size, MPI_INT, MPI_MAX, MPI_COMM_WORLD, &request);
             }
+            MPI_Wait(&request, &status);
             break;    
 
         default:
@@ -209,7 +215,7 @@ int Error_Test_exscan(int argc, char **argv)
     }
 
     if (err == MPI_SUCCESS) {
-        printf("Process %d found no error in exscan test %d \n", my_world_rank, test_num);
+        printf("Process %d found no error in iscan test %d \n", my_world_rank, test_num);
     } else {      
         MPI_Error_string(err, str, &slen); 
         printf("Process %d found error; message is: %s\n", my_world_rank, str);
