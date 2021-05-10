@@ -141,7 +141,7 @@ int Error_Test_allgather(int argc, char **argv)
             err = MPI_Allgather(sendbuf, size, MPI_INT, recvbuf, size, MPI_INT, MPI_COMM_NULL);
             break;
 
-        case 6:
+        case 5:
             /* Mismatch COMM */
             size = ARRAYSIZE;
 

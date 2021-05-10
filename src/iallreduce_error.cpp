@@ -147,7 +147,7 @@ int Error_Test_iallreduce(int argc, char **argv)
 
             break;
 
-        case 6:
+        case 5:
             /* Mismatch COMM */
             size = ARRAYSIZE;
 
@@ -163,7 +163,7 @@ int Error_Test_iallreduce(int argc, char **argv)
 
             break;
 
-        case 7:
+        case 6:
             /* Mismatch OP */
             size = ARRAYSIZE;
 

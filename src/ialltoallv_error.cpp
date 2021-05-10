@@ -158,7 +158,7 @@ int Error_Test_ialltoallv(int argc, char **argv)
 
             break;
 
-        case 6:
+        case 5:
             /* Mismatch COMM */
 
             if (my_world_rank == 0) 

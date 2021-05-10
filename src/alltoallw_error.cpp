@@ -160,7 +160,7 @@ int Error_Test_alltoallw(int argc, char **argv)
             err = MPI_Alltoallw(sendbuf, sendcounts, sdispls, sendtypes, recvbuf, recvcounts,rdispls, recvtypes, MPI_COMM_NULL);
             break;
 
-        case 6:
+        case 5:
             /* Mismatch COMM */
 
             if (my_world_rank == 0) 
