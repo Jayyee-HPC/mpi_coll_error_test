@@ -138,7 +138,7 @@ int Error_Test_alltoall(int argc, char **argv)
             err = MPI_Alltoall(sendbuf, size, MPI_INT, recvbuf, size, MPI_INT, MPI_COMM_NULL);
             break;
 
-        case 6:
+        case 5:
             /* Mismatch COMM */
             size = ARRAYSIZE;
 

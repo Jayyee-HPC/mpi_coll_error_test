@@ -138,7 +138,7 @@ int Error_Test_allreduce(int argc, char **argv)
             err = MPI_Allreduce(sendbuf, recvbuf, size, MPI_INT, MPI_MAX, MPI_COMM_NULL);
             break;
 
-        case 6:
+        case 5:
             /* Mismatch COMM */
             size = ARRAYSIZE;
 
@@ -153,7 +153,7 @@ int Error_Test_allreduce(int argc, char **argv)
 
             break;
 
-        case 7:
+        case 6:
             /* Mismatch OP */
             size = ARRAYSIZE;
 

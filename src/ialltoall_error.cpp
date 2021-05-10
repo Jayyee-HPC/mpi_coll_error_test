@@ -147,7 +147,7 @@ int Error_Test_ialltoall(int argc, char **argv)
 
             break;
 
-        case 6:
+        case 5:
             /* Mismatch COMM */
             size = ARRAYSIZE;
 

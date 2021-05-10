@@ -149,7 +149,7 @@ int Error_Test_alltoallv(int argc, char **argv)
             err = MPI_Alltoallv(sendbuf, sendcounts, sdispls, MPI_INT, recvbuf, recvcounts,rdispls, MPI_INT, MPI_COMM_NULL);
             break;
 
-        case 6:
+        case 5:
             /* Mismatch COMM */
 
             if (my_world_rank == 0) 
