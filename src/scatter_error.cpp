@@ -1,6 +1,6 @@
 #include "mpi_error_test.h"
 
-/* Scan error test*/
+/* Scatter error test*/
 int Error_Test_scatter(int argc, char **argv)
 {
     if(argc != 3)

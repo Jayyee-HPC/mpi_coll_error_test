@@ -1,7 +1,7 @@
 #include "mpi_error_test.h"
 
-/* Scan error test*/
-int Error_Test_exscan(int argc, char **argv)
+/* Iscatterv error test*/
+int Error_Test_iscatterv(int argc, char **argv)
 {
     if(argc != 3)
     {
@@ -12,11 +12,14 @@ int Error_Test_exscan(int argc, char **argv)
     //MPI initial
     int my_world_rank;
     int num_world_nodes;
-    int i, size;
+    int i, size, root;
     int err, ierr;
     int *sendbuf, *recvbuf;
+    int *sendcounts, *displs;
     char str[MPI_MAX_ERROR_STRING + 1];
     int slen;
+    MPI_Request request;
+    MPI_Status status;
 
     int test_num = std::stoi(argv[2]);
     ierr = 0;
@@ -32,15 +35,25 @@ int Error_Test_exscan(int argc, char **argv)
         return 0;
     }
 
-    sendbuf = (int *)malloc(sizeof(int) * ARRAYSIZE);
+    sendbuf = (int *)malloc(sizeof(int) * ARRAYSIZE * num_world_nodes);
     recvbuf = (int *)malloc(sizeof(int) * ARRAYSIZE);
+    sendcounts = (int *)malloc(sizeof(int) * num_world_nodes);
+    displs = (int *)malloc(sizeof(int) * num_world_nodes); 
+    root = 0;
 
-
-    for(i = 0; i < ARRAYSIZE; ++i)
+    if(my_world_rank == root)
     {
-        sendbuf[i] = i + my_world_rank * ARRAYSIZE;
+        for(i = 0; i < ARRAYSIZE * num_world_nodes; ++i)
+        {
+            sendbuf[i] = i + my_world_rank * ARRAYSIZE;
+        }
     }
 
+    for(i = 0; i < num_world_nodes; ++i)
+    {
+        sendcounts[i] = ARRAYSIZE;
+        displs[i] = i * ARRAYSIZE;
+    }
 
     for(i = 0; i < ARRAYSIZE; ++i)
     {
@@ -51,29 +64,28 @@ int Error_Test_exscan(int argc, char **argv)
     switch(test_num)
     {
         case 0:
-            /* rank 0 scan more */
+            /* rank 0 scatterv more */
             if (my_world_rank == 0) 
             {
                 size = ARRAYSIZE;
             }
             else
             {
-                size = ARRAYSIZE;
+                size = ARRAYSIZE/2;
             }
 
-            err = MPI_Exscan(sendbuf, recvbuf, size, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
-
+            err =  MPI_Iscatterv(sendbuf, sendcounts, displs, MPI_INT, recvbuf, size, MPI_INT, root, MPI_COMM_WORLD, &request);
+            MPI_Wait(&request, &status);
             if(VERBOSE)
             {
                 ierr = 0;
-                printf("%d rank, ", my_world_rank);
                 for(int i = 0; i < size; ++i)
                 {
-                    /* TODO: */
-                    printf("%d ", recvbuf[i]);
+                    if(recvbuf[i] != i + my_world_rank*size)
+                    {
+                        ++ierr;
+                    }
                 }
-
-                printf("\n");
 
                 if(ierr)
                 {
@@ -84,25 +96,32 @@ int Error_Test_exscan(int argc, char **argv)
             break;
 
         case 1:
-            /* Root send less */
+            /* Root scatterv less */
             if (my_world_rank == 0) 
             {
                 size = ARRAYSIZE/2;
+
+                for(i = 0; i < num_world_nodes; ++i)
+                {
+                    sendcounts[i] = ARRAYSIZE/2;
+                }
             }
             else
             {
                 size = ARRAYSIZE;
             }
 
-            err = MPI_Scan(sendbuf, recvbuf, size, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
-
+            err =  MPI_Iscatterv(sendbuf, sendcounts, displs, MPI_INT, recvbuf, size, MPI_INT, root, MPI_COMM_WORLD, &request);
+            MPI_Wait(&request, &status);
             if(VERBOSE)
             {
                 ierr = 0;
                 for(int i = 0; i < size; ++i)
                 {
-                    /* TODO: */
-
+                    if(recvbuf[i] != i + my_world_rank*size)
+                    {
+                        ++ierr;
+                    }
                 }
 
                 if(ierr)
@@ -118,15 +137,18 @@ int Error_Test_exscan(int argc, char **argv)
             sendbuf = NULL;
             size = ARRAYSIZE;
 
-            err = MPI_Scan(sendbuf, recvbuf, size, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+            err =  MPI_Iscatterv(sendbuf, sendcounts, displs, MPI_INT, recvbuf, size, MPI_INT, root, MPI_COMM_WORLD, &request);
+            MPI_Wait(&request, &status);
 
             if(VERBOSE)
             {
                 ierr = 0;
                 for(int i = 0; i < size; ++i)
                 {
-                    /* TODO: */
-
+                    if(recvbuf[i] != i + my_world_rank*size)
+                    {
+                        ++ierr;
+                    }
                 }
 
                 if(ierr)
@@ -143,20 +165,23 @@ int Error_Test_exscan(int argc, char **argv)
 
             if (my_world_rank == 0) 
             {
-                err = MPI_Scan(sendbuf, recvbuf, size, MPI_UNSIGNED, MPI_SUM, MPI_COMM_WORLD);
+                err =  MPI_Iscatterv(sendbuf, sendcounts, displs, MPI_UNSIGNED, recvbuf, size, MPI_UNSIGNED, root, MPI_COMM_WORLD, &request);
             } 
             else 
             {
-                err = MPI_Scan(sendbuf, recvbuf, size, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+                err =  MPI_Iscatterv(sendbuf, sendcounts, displs, MPI_INT, recvbuf, size, MPI_INT, root, MPI_COMM_WORLD, &request);
             }
+            MPI_Wait(&request, &status);
 
             if(VERBOSE)
             {
                 ierr = 0;
                 for(int i = 0; i < size; ++i)
                 {
-                    /* TODO: */
-
+                    if(recvbuf[i] != i + my_world_rank*size)
+                    {
+                        ++ierr;
+                    }
                 }
 
                 if(ierr)
@@ -165,14 +190,15 @@ int Error_Test_exscan(int argc, char **argv)
                 }
             }
 
-
             break;
 
         case 4:
             /* NULL COMM */
             size = ARRAYSIZE;
 
-            err = MPI_Scan(sendbuf, recvbuf, size, MPI_INT, MPI_SUM, MPI_COMM_NULL);
+            err =  MPI_Iscatterv(sendbuf, sendcounts, displs, MPI_INT, recvbuf, size, MPI_INT, root, MPI_COMM_NULL, &request);
+            MPI_Wait(&request, &status);
+
             break;
 
         case 5:
@@ -181,26 +207,48 @@ int Error_Test_exscan(int argc, char **argv)
 
             if (my_world_rank == 0) 
             {
-                err = MPI_Scan(sendbuf, recvbuf, size, MPI_INT, MPI_SUM, MPI_COMM_SELF);
+                err =  MPI_Iscatterv(sendbuf, sendcounts, displs, MPI_INT, recvbuf, size, MPI_INT, root, MPI_COMM_SELF, &request);
             } 
             else 
             {
-                err = MPI_Scan(sendbuf, recvbuf, size, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+                err =  MPI_Iscatterv(sendbuf, sendcounts, displs, MPI_INT, recvbuf, size, MPI_INT, root, MPI_COMM_WORLD, &request);
             }
+            MPI_Wait(&request, &status);
             break;
 
         case 6:
-            /* Mismatch operator */
+            /* Mismatch root */
             size = ARRAYSIZE;
 
             if (my_world_rank == 0) 
             {
-                err = MPI_Scan(sendbuf, recvbuf, size, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+                root = 0;
             } 
             else 
             {
-                err = MPI_Scan(sendbuf, recvbuf, size, MPI_INT, MPI_MAX, MPI_COMM_WORLD);
+                root = 1;
             }
+
+            err =  MPI_Iscatterv(sendbuf, sendcounts, displs, MPI_INT, recvbuf, size, MPI_INT, root, MPI_COMM_WORLD, &request);
+            MPI_Wait(&request, &status);
+            
+            if(VERBOSE)
+            {
+                ierr = 0;
+                for(int i = 0; i < size; ++i)
+                {
+                    if(recvbuf[i] != i + my_world_rank*size)
+                    {
+                        ++ierr;
+                    }
+                }
+
+                if(ierr)
+                {
+                    printf("Rank %d, %d errors \n", my_world_rank, ierr);
+                }
+            }
+
             break;    
 
         default:
@@ -209,7 +257,7 @@ int Error_Test_exscan(int argc, char **argv)
     }
 
     if (err == MPI_SUCCESS) {
-        printf("Process %d found no error in exscan test %d \n", my_world_rank, test_num);
+        printf("Process %d found no error in iscatterv test %d \n", my_world_rank, test_num);
     } else {      
         MPI_Error_string(err, str, &slen); 
         printf("Process %d found error; message is: %s\n", my_world_rank, str);
@@ -217,5 +265,7 @@ int Error_Test_exscan(int argc, char **argv)
 
     free(recvbuf);
     free(sendbuf);
+    free(sendcounts);
+    free(displs);
     return 0;
 }
