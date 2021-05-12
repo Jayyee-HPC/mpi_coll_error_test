@@ -17,6 +17,7 @@ int Error_Test_iallreduce(int argc, char **argv)
     int *sendbuf, *recvbuf;
     MPI_Request request;
     MPI_Status status;
+    status.MPI_ERROR = MPI_SUCCESS;
 
     char str[MPI_MAX_ERROR_STRING + 1];
     int slen;
@@ -44,7 +45,7 @@ int Error_Test_iallreduce(int argc, char **argv)
         sendbuf[i] = i+my_world_rank*ARRAYSIZE;
     }
 
-    for(i = 0; i < ARRAYSIZE * num_world_nodes; ++i)
+    for(i = 0; i < ARRAYSIZE; ++i)
     {
         recvbuf[i] = -1;
     }

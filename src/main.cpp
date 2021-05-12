@@ -63,18 +63,23 @@ int main(int argc, char **argv)
 
         case 9:
             Error_Test_allgatherv(argc, argv);   
+            break;
 
         case 10:
             Error_Test_allreduce(argc, argv); 
+            break;
 
         case 11:
             Error_Test_alltoall(argc, argv); 
+            break;
            
         case 12:
             Error_Test_alltoallv(argc, argv); 
+            break;
             
         case 13:
             Error_Test_alltoallw(argc, argv); 
+            break;
 
         case 14:
             Error_Test_ibcast(argc, argv);
@@ -114,18 +119,23 @@ int main(int argc, char **argv)
 
         case 23:
             Error_Test_iallgatherv(argc, argv);   
+            break;
 
         case 24:
             Error_Test_iallreduce(argc, argv); 
+            break;
 
         case 25:
-            Error_Test_ialltoall(argc, argv); 
+            Error_Test_ialltoall(argc, argv);
+            break; 
            
         case 26:
             Error_Test_ialltoallv(argc, argv); 
+            break;
             
         case 27:
-            Error_Test_ialltoallw(argc, argv); 
+            Error_Test_ialltoallw(argc, argv);
+            break; 
 
         default:
             printf("Collective %d is not defined.\n",op_num);

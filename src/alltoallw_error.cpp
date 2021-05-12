@@ -169,7 +169,7 @@ int Error_Test_alltoallw(int argc, char **argv)
             } 
             else 
             {
-                err = MPI_Alltoallw(sendbuf, sendcounts, sdispls, sendtypes, recvbuf, recvcounts,rdispls, recvtypes, MPI_COMM_NULL);
+                err = MPI_Alltoallw(sendbuf, sendcounts, sdispls, sendtypes, recvbuf, recvcounts,rdispls, recvtypes, MPI_COMM_WORLD);
             }
 
             break;

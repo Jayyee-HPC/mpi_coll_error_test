@@ -17,6 +17,7 @@ int Error_Test_ireduce(int argc, char **argv)
     int *sendbuf, *recvbuf;
     MPI_Request request;
     MPI_Status status;
+    status.MPI_ERROR = MPI_SUCCESS;
 
     char str[MPI_MAX_ERROR_STRING + 1];
     int slen;

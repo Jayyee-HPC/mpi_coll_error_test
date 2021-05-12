@@ -50,6 +50,12 @@ int Error_Test_allgatherv(int argc, char **argv)
         recvbuf[i] = -1;
     }
 
+    for(i = 0; i < num_world_nodes; ++i)
+    {
+        recvcounts[i] = ARRAYSIZE;
+        displs[i] = i*ARRAYSIZE;
+    }
+
     switch(test_num)
     {
         case 0:
@@ -61,6 +67,10 @@ int Error_Test_allgatherv(int argc, char **argv)
             else 
             {
                 size = ARRAYSIZE/2;
+                for(i = 0; i < num_world_nodes; ++i)
+                {
+                    recvcounts[i] = ARRAYSIZE/2;
+                }
             }
 
             err = MPI_Allgatherv(sendbuf, size, MPI_INT, recvbuf, recvcounts, displs, MPI_INT, MPI_COMM_WORLD);
@@ -82,6 +92,10 @@ int Error_Test_allgatherv(int argc, char **argv)
             if (my_world_rank == 0) 
             {
                 size = ARRAYSIZE/2;
+                for(i = 0; i < num_world_nodes; ++i)
+                {
+                    recvcounts[i] = ARRAYSIZE/2;
+                }
             } 
             else 
             {

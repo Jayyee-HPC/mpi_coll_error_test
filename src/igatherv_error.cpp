@@ -20,6 +20,7 @@ int Error_Test_igatherv(int argc, char **argv)
     int slen;
     MPI_Request request;
     MPI_Status status;
+    status.MPI_ERROR = MPI_SUCCESS;
 
     int test_num = std::stoi(argv[2]);
 
