@@ -19,6 +19,7 @@ int Error_Test_iexscan(int argc, char **argv)
     int slen;
     MPI_Request request;
     MPI_Status status;
+    status.MPI_ERROR = MPI_SUCCESS;
 
     int test_num = std::stoi(argv[2]);
     ierr = 0;
@@ -60,7 +61,7 @@ int Error_Test_iexscan(int argc, char **argv)
             }
             else
             {
-                size = ARRAYSIZE;
+                size = ARRAYSIZE/2;
             }
 
             err = MPI_Iexscan(sendbuf, recvbuf, size, MPI_INT, MPI_SUM, MPI_COMM_WORLD, &request);

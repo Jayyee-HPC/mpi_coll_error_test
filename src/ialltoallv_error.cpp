@@ -18,6 +18,7 @@ int Error_Test_ialltoallv(int argc, char **argv)
     int *sendcounts, *sdispls, *recvcounts, *rdispls;
     MPI_Request request;
     MPI_Status status;
+    status.MPI_ERROR = MPI_SUCCESS;
 
     char str[MPI_MAX_ERROR_STRING + 1];
     int slen;
@@ -167,7 +168,7 @@ int Error_Test_ialltoallv(int argc, char **argv)
             } 
             else 
             {
-                err = MPI_Ialltoallv(sendbuf, sendcounts, sdispls, MPI_INT, recvbuf, recvcounts,rdispls, MPI_INT, MPI_COMM_NULL, &request);
+                err = MPI_Ialltoallv(sendbuf, sendcounts, sdispls, MPI_INT, recvbuf, recvcounts,rdispls, MPI_INT, MPI_COMM_WORLD, &request);
             }
             MPI_Wait(&request, &status);
 

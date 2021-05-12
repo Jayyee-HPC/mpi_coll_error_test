@@ -17,6 +17,7 @@ int Error_Test_igather(int argc, char **argv)
     int *sendbuf, *recvbuf;
     MPI_Request request;
     MPI_Status status;
+    status.MPI_ERROR = MPI_SUCCESS;
 
     char str[MPI_MAX_ERROR_STRING + 1];
     int slen;
@@ -25,6 +26,7 @@ int Error_Test_igather(int argc, char **argv)
 
     MPI_Comm_size(MPI_COMM_WORLD,&num_world_nodes);
     MPI_Comm_rank(MPI_COMM_WORLD,&my_world_rank);
+
     ierr = MPI_SUCCESS;
 
     if(num_world_nodes < 3)
@@ -33,12 +35,18 @@ int Error_Test_igather(int argc, char **argv)
         return 0;
     }
 
-    sendbuf = (int *)malloc(sizeof(int) * ARRAYSIZE);
-    recvbuf = (int *)malloc(sizeof(int) * ARRAYSIZE * num_world_nodes);
+    size = ARRAYSIZE;
+    sendbuf = (int *)malloc(sizeof(int) * size);
+    recvbuf = (int *)malloc(sizeof(int) * size * num_world_nodes);
 
-    for(i = 0; i < ARRAYSIZE; ++i)
+    for(i = 0; i < size; ++i)
     {
         sendbuf[i] = i+my_world_rank;
+    }
+
+    for(i = 0; i < size* num_world_nodes; ++i)
+    {
+        recvbuf[i] = -1;
     }
 
     switch(test_num)
@@ -47,11 +55,11 @@ int Error_Test_igather(int argc, char **argv)
             /* Root gather more */
             if (my_world_rank == 0) 
             {
-                ierr = MPI_Igather(sendbuf, ARRAYSIZE, MPI_INT, recvbuf, ARRAYSIZE, MPI_INT, 0, MPI_COMM_WORLD, &request);
+                ierr = MPI_Igather(sendbuf, size, MPI_INT, recvbuf, size, MPI_INT, 0, MPI_COMM_WORLD, &request);
             } 
             else 
             {
-                ierr = MPI_Igather(sendbuf, ARRAYSIZE/2, MPI_INT, recvbuf, ARRAYSIZE/2, MPI_INT, 0, MPI_COMM_WORLD, &request);
+                ierr = MPI_Igather(sendbuf, size/2, MPI_INT, recvbuf, size/2, MPI_INT, 0, MPI_COMM_WORLD, &request);
             }
 
             MPI_Wait(&request, &status);
@@ -80,16 +88,29 @@ int Error_Test_igather(int argc, char **argv)
 
         case 3:
             /* Mismatch datatype */
+            size = 10;
+
+            printf("Rank %d %d, ", my_world_rank, size);
+
             if (my_world_rank == 0) 
             {
-                ierr = MPI_Igather(sendbuf, ARRAYSIZE, MPI_UNSIGNED, recvbuf, ARRAYSIZE, MPI_UNSIGNED, 0, MPI_COMM_WORLD, &request);
+                ierr = MPI_Igather(sendbuf, size, MPI_UNSIGNED, recvbuf, size, MPI_UNSIGNED, 0, MPI_COMM_WORLD, &request);
+                //ierr = MPI_Igather(sendbuf, size, MPI_INT, recvbuf, size, MPI_INT, 0, MPI_COMM_WORLD, &request);
             } 
             else 
             {
-                ierr = MPI_Igather(sendbuf, ARRAYSIZE, MPI_INT, recvbuf, ARRAYSIZE, MPI_INT, 0, MPI_COMM_WORLD, &request);
+                ierr = MPI_Igather(sendbuf, size, MPI_INT, recvbuf, size, MPI_INT, 0, MPI_COMM_WORLD, &request);
             }
 
             MPI_Wait(&request, &status);
+
+            printf("Rank %d %d, ", my_world_rank, size);
+            if(my_world_rank == 0)
+            for(i = 0; i < size*num_world_nodes; ++i)
+                printf("%d ", recvbuf[i]);
+
+            printf("\n");
+
             break;
 
         case 4:

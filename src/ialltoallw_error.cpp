@@ -19,6 +19,7 @@ int Error_Test_ialltoallw(int argc, char **argv)
     MPI_Datatype *sendtypes, *recvtypes;
     MPI_Request request;
     MPI_Status status;
+    status.MPI_ERROR = MPI_SUCCESS;
 
     char str[MPI_MAX_ERROR_STRING + 1];
     int slen;
@@ -177,7 +178,7 @@ int Error_Test_ialltoallw(int argc, char **argv)
             } 
             else 
             {
-                err = MPI_Ialltoallw(sendbuf, sendcounts, sdispls, sendtypes, recvbuf, recvcounts,rdispls, recvtypes, MPI_COMM_NULL, &request);
+                err = MPI_Ialltoallw(sendbuf, sendcounts, sdispls, sendtypes, recvbuf, recvcounts,rdispls, recvtypes, MPI_COMM_WORLD, &request);
             }
             MPI_Wait(&request, &status);
 

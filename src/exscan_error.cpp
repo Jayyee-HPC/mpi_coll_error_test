@@ -58,7 +58,7 @@ int Error_Test_exscan(int argc, char **argv)
             }
             else
             {
-                size = ARRAYSIZE;
+                size = ARRAYSIZE/2;
             }
 
             err = MPI_Exscan(sendbuf, recvbuf, size, MPI_INT, MPI_SUM, MPI_COMM_WORLD);

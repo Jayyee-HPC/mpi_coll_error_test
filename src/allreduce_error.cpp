@@ -42,7 +42,7 @@ int Error_Test_allreduce(int argc, char **argv)
         sendbuf[i] = i+my_world_rank*ARRAYSIZE;
     }
 
-    for(i = 0; i < ARRAYSIZE * num_world_nodes; ++i)
+    for(i = 0; i < ARRAYSIZE ; ++i)
     {
         recvbuf[i] = -1;
     }
