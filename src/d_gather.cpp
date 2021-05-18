@@ -117,25 +117,33 @@ int Error_Test_dgather(int argc, char **argv)
             break;
 
         case 2:
-            /* NULL send buf */
+            /* NULL recv buf */
             root = 0;
-            sendbuf = NULL;
+            recvbuf = NULL;
 
             err = MPI_Gather(sendbuf, size, MPI_INT, recvbuf, size, MPI_INT, root, MPI_COMM_WORLD);
             break;
 
         case 3:
-            /* Mismatch datatype */
-            root = 0;
+            /* all use different buffer size */
+            size = size - my_world_rank;
 
-            if (my_world_rank == 0) 
+            err = MPI_Gather(sendbuf, size, MPI_INT, recvbuf, size, MPI_INT, root, MPI_COMM_WORLD);
+
+            if (my_world_rank == root) 
             {
-                err = MPI_Gather(sendbuf, size, MPI_UNSIGNED, recvbuf, size, MPI_UNSIGNED, root, MPI_COMM_WORLD);
+                for(i = 0; i < num_world_nodes * size; ++i)
+                {                 
+                    if(recvbuf[i] != i)
+                        ++ierr;
+                }
             } 
-            else 
+
+            if(ierr)
             {
-                err = MPI_Gather(sendbuf, size, MPI_INT, recvbuf, size, MPI_INT, root, MPI_COMM_WORLD);
+                printf("Rank %d, %d errors on receive\n", my_world_rank, ierr);
             }
+
             break;
 
         case 4:
