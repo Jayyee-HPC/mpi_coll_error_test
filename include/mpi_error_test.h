@@ -104,4 +104,7 @@ int Error_Test_ialltoallv(int argc, char **argv);
 /* Ialltoallw error test*/
 int Error_Test_ialltoallw(int argc, char **argv);
 
+/***************************Detailed tests******************************************/
+int Error_Test_dgather(int argc, char **argv);
+
 #endif //ndef __MPI_ERROR_TEST__H

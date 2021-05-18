@@ -137,6 +137,10 @@ int main(int argc, char **argv)
             Error_Test_ialltoallw(argc, argv);
             break; 
 
+	case 28:
+		Error_Test_dgather(argc, argv);
+		break;
+
         default:
             printf("Collective %d is not defined.\n",op_num);
             printf_test_list();
